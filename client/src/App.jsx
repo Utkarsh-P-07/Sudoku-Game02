@@ -3,7 +3,6 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 
 import { Auth } from './pages/Auth';
-import { Home } from './pages/Home';
 import { Game } from './pages/Game';
 import { Profile } from './pages/Profile';
 import { Leaderboard } from './pages/Leaderboard';
@@ -81,11 +80,7 @@ function App() {
           <Routes>
             <Route path="/auth" element={<Auth />} />
 
-            <Route path="/" element={
-              <RequireAuth>
-                <Home />
-              </RequireAuth>
-            } />
+            <Route path="/" element={<Navigate to="/play" replace />} />
 
             <Route path="/game/:difficulty" element={
               <RequireAuth>

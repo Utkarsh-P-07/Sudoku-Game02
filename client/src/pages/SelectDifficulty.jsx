@@ -1,5 +1,4 @@
 import { useNavigate } from 'react-router-dom';
-import { Home as HomeIcon } from 'lucide-react';
 import { Sidebar } from '../components/Sidebar';
 
 export const SelectDifficulty = () => {
@@ -25,7 +24,6 @@ export const SelectDifficulty = () => {
 
       {/* MAIN CONTENT AREA */}
       <div className="flex-1 flex flex-col items-center justify-center p-6 pt-16 md:pt-6 relative">
-        <HomeIcon onClick={() => navigate('/')} className="w-8 h-8 absolute top-6 right-6 cursor-pointer text-slate-800 hover:text-slate-500 md:hidden" />
 
         <h2 className="text-[40px] md:text-[56px] font-bold text-black mb-12 tracking-wide text-center" style={{ fontFamily: "'Caveat Brush', cursive" }}>
           Choose a difficulty :

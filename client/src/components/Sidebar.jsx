@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { Home as HomeIcon, Gamepad2, Menu, HelpCircle, Trophy, User, Info } from 'lucide-react';
+import { Gamepad2, Menu, HelpCircle, Trophy, User, Info } from 'lucide-react';
 
 export const Sidebar = ({ activeTab = 'play' }) => {
   const navigate = useNavigate();
@@ -9,13 +9,12 @@ export const Sidebar = ({ activeTab = 'play' }) => {
       {/* Top Header Row */}
       <div className="flex items-center justify-between p-4 md:p-6 mb-8">
         <div 
-          onClick={() => navigate('/')} 
+          onClick={() => navigate('/play')} 
           className="text-3xl md:text-4xl font-bold tracking-widest cursor-pointer hover:text-slate-300 transition-colors" 
           style={{ fontFamily: "'Caveat Brush', cursive" }}
         >
           SUDOKU
         </div>
-        <HomeIcon onClick={() => navigate('/')} className="w-7 h-7 md:w-8 md:h-8 cursor-pointer hover:text-slate-300 hidden md:block" />
       </div>
 
       {/* Sidebar Links */}
