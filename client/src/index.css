@@ -1,0 +1,54 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  --font-sans: 'Inter', system-ui, sans-serif;
+  
+  --color-sudoku-dark: #121212;
+  --color-sudoku-darker: #0a0a0a;
+  --color-sudoku-light: #f8fafc;
+  --color-sudoku-light-alt: #f1f5f9;
+
+  /* Custom palette for sleek mode */
+  --color-primary-500: #3b82f6; /* Blue 500 */
+  --color-primary-600: #2563eb;
+  --color-accent-blue: #eff6ff; /* Blue 50 */
+  --color-accent-blue-dark: #1e3a8a; /* Blue 900 for dark mode selction */
+  
+  --color-cell-border-light: #e2e8f0; /* slate-200 */
+  --color-cell-border-dark: #334155; /* slate-700 */
+  
+  --color-grid-border-light: #94a3b8; /* slate-400 */
+  --color-grid-border-dark: #64748b; /* slate-500 */
+}
+
+@layer base {
+  body {
+    @apply antialiased text-slate-800 bg-slate-50;
+  }
+  .dark body {
+    @apply text-slate-200 bg-[#0f1117];
+  }
+}
+
+/* Sudoku Grid Utilities */
+.sudoku-cell {
+  @apply relative w-full h-full flex items-center justify-center text-xl sm:text-2xl font-medium transition-all duration-200 select-none cursor-pointer;
+}
+
+.sudoku-cell.dark-mode {
+  @apply border-slate-700 text-slate-200 bg-transparent;
+}
+
+.sudoku-cell.light-mode {
+  @apply border-slate-200 text-slate-800 bg-white;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
