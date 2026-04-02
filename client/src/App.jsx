@@ -7,10 +7,13 @@ import { Home } from './pages/Home';
 import { Game } from './pages/Game';
 import { Profile } from './pages/Profile';
 import { Leaderboard } from './pages/Leaderboard';
+import { SelectDifficulty } from './pages/SelectDifficulty';
+import { About } from './pages/About';
+import { Help } from './pages/Help';
 
 const GlobalWatermark = () => (
-  <div className="fixed inset-0 pointer-events-none flex items-center justify-center z-[9999] overflow-hidden">
-    <svg 
+  <div className="fixed inset-0 pointer-events-none flex items-center justify-center -z-10 overflow-hidden">
+    <svg
       className="absolute w-[200vw] h-[200vh] min-w-[200vw] min-h-[200vh] text-slate-400 opacity-10 dark:text-white dark:opacity-[0.06] -rotate-12 select-none"
       xmlns="http://www.w3.org/2000/svg"
     >
@@ -55,7 +58,7 @@ const GlobalWatermark = () => (
 
 const RequireAuth = ({ children }) => {
   const { user, loading } = useAuth();
-  
+
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-[#0f1117]">
       <div className="animate-pulse flex flex-col items-center gap-4">
@@ -64,7 +67,7 @@ const RequireAuth = ({ children }) => {
       </div>
     </div>
   );
-  
+
   if (!user) return <Navigate to="/auth" />;
   return children;
 };
@@ -77,31 +80,49 @@ function App() {
           <GlobalWatermark />
           <Routes>
             <Route path="/auth" element={<Auth />} />
-            
+
             <Route path="/" element={
               <RequireAuth>
                 <Home />
               </RequireAuth>
             } />
-            
+
             <Route path="/game/:difficulty" element={
               <RequireAuth>
                 <Game />
               </RequireAuth>
             } />
-            
+
             <Route path="/profile" element={
               <RequireAuth>
                 <Profile />
               </RequireAuth>
             } />
-            
+
             <Route path="/leaderboard" element={
               <RequireAuth>
                 <Leaderboard />
               </RequireAuth>
             } />
-            
+
+            <Route path="/play" element={
+              <RequireAuth>
+                <SelectDifficulty />
+              </RequireAuth>
+            } />
+
+            <Route path="/about" element={
+              <RequireAuth>
+                <About />
+              </RequireAuth>
+            } />
+
+            <Route path="/help" element={
+              <RequireAuth>
+                <Help />
+              </RequireAuth>
+            } />
+
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </BrowserRouter>

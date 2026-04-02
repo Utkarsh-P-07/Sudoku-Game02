@@ -6,10 +6,11 @@ import { submitGameResult } from '../services/userService';
 import { formatTime } from '../utils/gameUtils';
 
 import { Board } from '../components/Board';
-import { Controls } from '../components/Controls';
+// import { Controls } from '../components/Controls'; // Removed purely based on mock
 import { NumberPad } from '../components/NumberPad';
+import { Sidebar } from '../components/Sidebar';
 import { BadgePopup } from '../components/BadgePopup';
-import { ChevronLeft } from 'lucide-react';
+import { Pause } from 'lucide-react';
 
 export const Game = () => {
   const { difficulty } = useParams();
@@ -21,7 +22,6 @@ export const Game = () => {
 
   const handleWin = async (result) => {
     if (user && profile) {
-      // Avoid guests writing massive data if specified, but since guest mode creates a temp profile we can write.
       const saveRes = await submitGameResult(
         user.uid,
         difficulty,
@@ -37,7 +37,6 @@ export const Game = () => {
           setShowBadges(true);
         }
 
-        // Optimistic UI Update
         setProfile((prev) => ({
           ...prev,
           points: prev.points + result.points,
@@ -54,7 +53,6 @@ export const Game = () => {
 
   const game = useSudoku(difficulty, handleWin);
 
-  // Key press support for desktop
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (game.gameStatus !== 'playing') return;
@@ -73,89 +71,61 @@ export const Game = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [game]);
 
-  const customBackAction = () => {
-    if (game.gameStatus === 'playing') {
-      if (window.confirm("Are you sure you want to quit? Your progress will be lost.")) {
-        navigate('/');
+  const getNumberCounts = () => {
+    const counts = Array(10).fill(9);
+    if (!game.board || game.board.length !== 9) return counts;
+    for (let r = 0; r < 9; r++) {
+      for (let c = 0; c < 9; c++) {
+        if (game.board[r] && game.board[r][c] !== 0) counts[game.board[r][c]]--;
       }
-    } else {
-      navigate('/');
     }
+    return counts;
   };
+  const remainingCounts = getNumberCounts();
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#f4f7ff] dark:bg-[#0f1117] text-slate-900 pb-10">
-      {/* Mobile-Native Blue Header Area */}
-      <div className="w-full bg-[#4a72ff] dark:bg-[#1a233a] rounded-b-xl flex flex-col px-4 pt-4 pb-6 sm:px-6 mb-6">
-        {/* Top title bar */}
-        <div className="flex items-center justify-between mb-4 mt-2">
-          <button onClick={customBackAction} className="text-white p-1">
-            <ChevronLeft size={28} />
-          </button>
-          <div className="flex flex-col items-center">
-            <h1 className="text-2xl font-bold text-white tracking-wide">Sudoku</h1>
-            <span className="text-[10px] text-white/70 font-semibold tracking-widest uppercase">Classic</span>
-          </div>
-          <div className="w-7"></div> {/* spacer for centering */}
-        </div>
+    <div className="min-h-screen flex w-full bg-[#f4f4f4] text-slate-900 font-sans">
+      
+      {/* SIDEBAR */}
+      <Sidebar activeTab="play" />
 
-        {/* Stats Row */}
-        <div className="flex items-center justify-between px-2 sm:px-8 mt-2">
-          <div className="flex flex-col items-center">
-            <span className="text-white font-semibold text-lg">{game.mistakes} / {game.maxMistakes}</span>
-            <span className="text-[9px] text-white/70 font-bold uppercase tracking-wider">Mistakes</span>
+      {/* MAIN GAME VIEW */}
+      <div className="flex-1 flex flex-col md:flex-row items-center md:items-start justify-center p-4 md:p-10 gap-x-12 relative overflow-y-auto">
+        
+        <div className="flex flex-col w-full max-w-[650px] relative">
+          
+          {/* Top text links */}
+          <div className="flex gap-12 w-full mb-6 font-bold text-lg pt-4 pl-4" style={{ fontFamily: "'Caveat Brush', cursive" }}>
+            <span className="cursor-pointer hover:opacity-70 transition-opacity" onClick={() => navigate('/play')}>New Game&gt;</span>
+            <span className="cursor-pointer hover:opacity-70 transition-opacity" onClick={() => {
+               game.newGame();
+            }}>Restart Level&gt;</span>
           </div>
-          <div className="flex flex-col items-center">
-            <span className="text-white font-semibold text-lg">{game.points}</span>
-            <span className="text-[9px] text-white/70 font-bold uppercase tracking-wider">Score</span>
-          </div>
-          <div className="flex flex-col items-center">
-            <span className="text-white font-semibold text-lg">{formatTime(game.timer)}</span>
-            <span className="text-[9px] text-white/70 font-bold uppercase tracking-wider">Time</span>
-          </div>
-        </div>
-      </div>
 
-      {/* Main Responsive Game Area */}
-      <div className="flex-1 flex flex-col lg:flex-row items-center lg:items-start lg:justify-center w-full max-w-6xl mx-auto gap-4 lg:gap-8 p-2 sm:p-4 mb-8">
-
-        {/* 1. CONTROLS (Top on Mobile, Left on Desktop) */}
-        <div className="order-1 lg:order-1 w-full lg:w-auto flex justify-center mt-2 lg:mt-[72px]">
-          <Controls
-            onUndo={game.undo}
-            onErase={game.eraseCell}
-            useHint={game.useHint}
-            isPencilMode={game.isPencilMode}
-            setIsPencilMode={game.setIsPencilMode}
-            disabled={game.gameStatus !== 'playing'}
-          />
-        </div>
-
-        {/* 2. BOARD (Center on both) */}
-        <div className="order-2 lg:order-2 w-full flex-1 max-w-[500px] flex flex-col items-center">
           <div className="w-full relative">
-            <Board
-              board={game.board}
-              initialBoard={game.initialBoard}
-              solution={game.solution}
-              selectedCell={game.selectedCell}
-              setSelectedCell={game.setSelectedCell}
+            <Board 
+              board={game.board} 
+              initialBoard={game.initialBoard} 
               pencilMarks={game.pencilMarks}
+              selectedCell={game.selectedCell} 
+              setSelectedCell={game.setSelectedCell}
+              solution={game.solution}
             />
 
             {game.gameStatus === 'loading' && (
               <div className="absolute inset-0 bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm flex items-center justify-center rounded">
-                <span className="font-semibold animate-pulse">Generating puzzle...</span>
+                <span className="font-semibold animate-pulse text-2xl" style={{ fontFamily: "'Caveat Brush', cursive" }}>Generating puzzle...</span>
               </div>
             )}
 
             {game.gameStatus === 'lost' && (
               <div className="absolute inset-0 bg-red-900/10 backdrop-blur-md flex flex-col items-center justify-center rounded gap-4">
-                <h2 className="text-3xl font-bold border-red-500 text-red-600 dark:text-red-400">Game Over</h2>
+                <h2 className="text-4xl font-bold border-red-500 text-red-600 dark:text-red-400" style={{ fontFamily: "'Caveat Brush', cursive" }}>Game Over</h2>
                 <p className="text-slate-700 dark:text-slate-200">Too many mistakes.</p>
                 <button
                   onClick={() => game.newGame()}
-                  className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-lg"
+                  className="px-8 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-full shadow-lg"
+                  style={{ fontFamily: "'Caveat Brush', cursive" }}
                 >
                   Try Again
                 </button>
@@ -164,42 +134,65 @@ export const Game = () => {
 
             {game.gameStatus === 'won' && !showBadges && (
               <div className="absolute inset-0 bg-emerald-900/20 backdrop-blur-md flex flex-col items-center justify-center rounded gap-4">
-                <h2 className="text-3xl font-bold text-emerald-600 dark:text-emerald-400">You Won!</h2>
-                <p className="text-slate-800 dark:text-slate-100 font-medium text-lg">Score: {game.points}</p>
+                <h2 className="text-4xl font-bold text-emerald-600 dark:text-emerald-400" style={{ fontFamily: "'Caveat Brush', cursive" }}>You Won!</h2>
+                <p className="text-slate-800 dark:text-slate-100 font-medium text-xl">Score: {game.points}</p>
                 <button
                   onClick={() => navigate('/')}
-                  className="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg shadow-lg mt-2"
+                  className="px-8 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-full shadow-lg mt-2"
+                  style={{ fontFamily: "'Caveat Brush', cursive" }}
                 >
                   Continue
                 </button>
               </div>
             )}
           </div>
+
+          {/* New Horizontal Single-Row Numpad underneath the board */}
+          <div className="w-full mt-6">
+            <NumberPad 
+              onNumberClick={game.handleInput} 
+              disabled={game.gameStatus !== 'playing'}
+              counts={remainingCounts}
+            />
+          </div>
+
         </div>
 
-        {/* 3. NUMBER PAD (Bottom on Mobile, Right on Desktop) */}
-        <div className="order-3 lg:order-3 w-full lg:w-80 flex flex-col items-center mt-2 lg:mt-[72px]">
-          <NumberPad
-            onNumberClick={game.handleInput}
-            disabled={game.gameStatus !== 'playing'}
-          />
+        {/* Right Stats Sidebar */}
+        <div className="hidden lg:flex flex-col gap-6 mt-[72px] w-[260px] shrink-0">
+          
+          {/* Blank Bubble Box (from image) - perhaps for future use */}
+          <div className="w-full h-[80px] bg-[#f8f8f8] border border-slate-300 rounded-[24px] shadow-[0_4px_16px_rgba(0,0,0,0.06)] flex items-center justify-center">
+             <span className="text-slate-400 italic font-bold tracking-widest text-sm uppercase" style={{ fontFamily: "'Caveat Brush', cursive" }}>
+                {difficulty || 'CLASSIC'}
+             </span>
+          </div>
+
+          {/* Main Stats Block */}
+          <div className="w-full bg-[#f8f8f8] border border-slate-300 rounded-[24px] shadow-[0_4px_16px_rgba(0,0,0,0.06)] flex flex-col items-center py-6 px-4">
+            
+            <div className="w-full flex justify-between items-center px-4 mb-2">
+               <span className="text-3xl font-bold tracking-wide text-black" style={{ fontFamily: "'Caveat Brush', cursive" }}>Score :</span>
+            </div>
+            
+            <div className="w-full flex justify-end px-4 mb-6 text-[44px] font-bold text-black" style={{ fontFamily: "'Caveat Brush', cursive" }}>
+               {String(game.points).padStart(5, '0')}
+            </div>
+
+            <div className="w-full h-px bg-slate-300 mb-6"></div>
+
+            <div className="w-full flex justify-between items-center px-4 mb-2">
+               <span className="text-3xl font-bold tracking-wide text-black" style={{ fontFamily: "'Caveat Brush', cursive" }}>Timer :</span>
+               <Pause size={24} className="text-black font-bold fill-black" />
+            </div>
+
+            <div className="w-full flex justify-end px-4 text-[44px] font-bold tracking-wide text-black" style={{ fontFamily: "'Caveat Brush', cursive" }}>
+               {formatTime(game.timer)}
+            </div>
+          </div>
+          
         </div>
 
-      </div>
-
-      {/* Game Rules Section (Always absolute bottom) */}
-      <div className="w-full max-w-4xl mx-auto px-4 mb-10">
-        <div className="p-5 rounded-2xl bg-white dark:bg-[#1a1f2e] border border-slate-200 dark:border-slate-800 shadow-sm">
-          <h3 className="text-lg font-bold text-slate-800 dark:text-slate-200 mb-3 flex items-center gap-2">
-            <span className="text-blue-500">📖</span> How to Play
-          </h3>
-          <ul className="text-sm text-slate-600 dark:text-slate-400 space-y-2 leading-relaxed">
-            <li>• Fill the grid so every row, column, and 3x3 box contains digits 1-9.</li>
-            <li>• <span className="font-semibold text-emerald-600 dark:text-emerald-400">Points:</span> Earn points for correctly placed numbers.</li>
-            <li>• <span className="font-semibold text-red-500 dark:text-red-400">Mistakes:</span> Lose 5 points. 3 Mistakes = Game Over!</li>
-            <li>• <span className="font-semibold text-amber-500 dark:text-amber-400">Hints:</span> Costs 15 points to reveal a single number.</li>
-          </ul>
-        </div>
       </div>
 
       <BadgePopup

@@ -1,40 +1,29 @@
-import { clsx } from 'clsx';
-import { twMerge } from 'tailwind-merge';
-import { isRelatedCell } from '../utils/gameUtils';
+// Board.jsx
 
-const cn = (...args) => twMerge(clsx(...args));
-
-export const Board = ({
-  board,
-  initialBoard,
-  solution,
-  selectedCell,
-  setSelectedCell,
-  pencilMarks
-}) => {
+export const Board = ({ board, initialBoard, pencilMarks, selectedCell, setSelectedCell, solution }) => {
   if (!board || board.length !== 9 || !board[0]) return null;
   if (!initialBoard || initialBoard.length !== 9 || !initialBoard[0]) return null;
-  if (!solution || solution.length !== 9 || !solution[0]) return null;
   if (!pencilMarks || pencilMarks.length !== 9 || !pencilMarks[0]) return null;
 
   return (
-    <div className="relative w-full max-w-[500px] aspect-square mx-auto select-none rounded-2xl sm:rounded-3xl border-2 sm:border-4 border-[#8fa5e3] dark:border-slate-800 shadow-xl overflow-hidden bg-white dark:bg-[#1a1f2e]">
+    <div className="relative w-full max-w-[650px] aspect-square mx-auto select-none border-[3px] md:border-[4px] border-black bg-[#fdfdfd] shadow-sm">
       <div className="w-full h-full grid grid-cols-9 grid-rows-9">
         {board.map((rowArr, row) =>
           rowArr.map((cellValue, col) => {
-            const isInitial = initialBoard[row][col] !== 0;
             const isSelected = selectedCell?.r === row && selectedCell?.c === col;
-            const isRelated = selectedCell ? isRelatedCell(row, col, selectedCell.r, selectedCell.c) : false;
+            const isInitial = initialBoard[row][col] !== 0;
+            const isWrong = cellValue !== 0 && solution && solution[row][col] !== cellValue;
+            
+            const isRelated = selectedCell && (
+              selectedCell.r === row || 
+              selectedCell.c === col || 
+              (Math.floor(selectedCell.r / 3) === Math.floor(row / 3) && Math.floor(selectedCell.c / 3) === Math.floor(col / 3))
+            ) && !isSelected;
 
-            // Highlight cells that have the exact same number as the currently selected cell
             let isSameNumber = false;
-            if (selectedCell && cellValue !== 0) {
-              const selectedValue = board[selectedCell.r][selectedCell.c];
-              if (selectedValue === cellValue) isSameNumber = true;
+            if (selectedCell && board[selectedCell.r][selectedCell.c] !== 0) {
+              isSameNumber = board[selectedCell.r][selectedCell.c] === cellValue;
             }
-
-            const isWrong = cellValue !== 0 && !isInitial && cellValue !== solution[row][col];
-            const hasPencilMarks = pencilMarks[row][col].length > 0 && cellValue === 0;
 
             // Explicit Border Calculation (Thick 3x3 borders vs Thin inner borders)
             const isRightBlockEdge = col === 2 || col === 5;
@@ -42,40 +31,48 @@ export const Board = ({
             const isRightOuter = col === 8;
             const isBottomOuter = row === 8;
 
-            const rightBorder = isRightOuter ? '' : 
-              (isRightBlockEdge ? 'border-r-[2px] sm:border-r-[3px] border-r-[#8fa5e3] dark:border-r-slate-800' : 'border-r border-r-[#d1dcff] dark:border-r-slate-700/50');
-              
-            const bottomBorder = isBottomOuter ? '' : 
-              (isBottomBlockEdge ? 'border-b-[2px] sm:border-b-[3px] border-b-[#8fa5e3] dark:border-b-slate-800' : 'border-b border-b-[#d1dcff] dark:border-b-slate-700/50');
+            const rightBorder = isRightOuter ? '' :
+              (isRightBlockEdge ? 'border-r-[3px] sm:border-r-[4px] border-r-black' : 'border-r border-r-slate-400');
+
+            const bottomBorder = isBottomOuter ? '' :
+              (isBottomBlockEdge ? 'border-b-[3px] sm:border-b-[4px] border-b-black' : 'border-b border-b-slate-400');
 
             return (
               <div
                 key={`${row}-${col}`}
                 onClick={() => setSelectedCell({ r: row, c: col })}
-                className={cn(
-                  'sudoku-cell group transition-colors duration-100 flex items-center justify-center text-2xl sm:text-3xl',
+                className={[
+                  'sudoku-cell group transition-colors duration-100 flex items-center justify-center text-3xl sm:text-4xl lg:text-[42px]',
                   rightBorder,
                   bottomBorder,
                   // State Styles
-                  isSelected ? 'bg-[#dce4ff] dark:bg-blue-800/80 shadow-inner' : 
-                  isRelated ? 'bg-[#f0f4ff] dark:bg-blue-900/30' : 
-                  isSameNumber && !isWrong ? 'bg-[#e2e9fc] dark:bg-blue-700/60' : 'bg-transparent',
-                  isWrong && 'bg-red-100 dark:bg-red-900/40 text-[#ff4b4b] dark:text-red-400',
+                  isSelected ? 'bg-slate-200' :
+                    isRelated ? 'bg-slate-100/60' :
+                      isSameNumber && !isWrong ? 'bg-slate-300/50' : 'bg-transparent',
+                  isWrong ? 'bg-red-100 text-[#ff4b4b]' : '',
                   // Text Styles
-                  isInitial ? 'text-slate-800 dark:text-slate-200 font-medium' : 'text-[#4a72ff] dark:text-[#aabeff] font-normal'
-                )}
+                  isInitial ? 'text-black font-normal leading-none' : 'text-slate-700 font-medium leading-none'
+                ].filter(Boolean).join(' ')}
+                style={isInitial || !isWrong ? { fontFamily: "'Caveat Brush', cursive" } : {}}
               >
                 {cellValue !== 0 ? (
-                  <span className="cursor-default pointer-events-none mt-[2px]">{cellValue}</span>
-                ) : hasPencilMarks ? (
-                  <div className="w-full h-full grid grid-cols-3 grid-rows-3 p-1 pointer-events-none opacity-60">
-                    {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
-                      <div key={num} className="font-sans flex items-center justify-center text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 leading-none">
-                        {pencilMarks[row][col].includes(num) ? num : ''}
-                      </div>
-                    ))}
-                  </div>
-                ) : null}
+                  cellValue
+                ) : (
+                  // Render Pencil Marks if cell is empty
+                  pencilMarks[row][col] && pencilMarks[row][col].length > 0 && (
+                    <div className="w-full h-full grid grid-cols-3 grid-rows-3 p-[2px]">
+                      {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
+                        <div key={num} className="flex items-center justify-center">
+                          {pencilMarks[row][col].includes(num) && (
+                            <span className="text-[10px] sm:text-xs text-slate-500 font-bold leading-none">
+                              {num}
+                            </span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )
+                )}
               </div>
             );
           })

@@ -135,7 +135,7 @@ export const useSudoku = (difficulty = 'easy', onWin = null) => {
       }
     } else {
       // Points reward for correct entry
-      let pts = difficulty === 'hard' ? 40 : difficulty === 'medium' ? 20 : 10;
+      let pts = difficulty === 'extreme' ? 60 : difficulty === 'hard' ? 40 : difficulty === 'medium' ? 20 : difficulty === 'easy' ? 10 : 5;
       setPoints(p => p + pts);
       
       // Auto-clear conflicting pencil marks from same row, col, box

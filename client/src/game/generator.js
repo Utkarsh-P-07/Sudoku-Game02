@@ -50,9 +50,11 @@ export const generatePuzzle = (difficulty = 'easy') => {
   // Determine number of cells to remove
   let cellsToRemove;
   switch (difficulty) {
+    case 'extreme': cellsToRemove = 62; break;
     case 'hard': cellsToRemove = 55; break;
     case 'medium': cellsToRemove = 45; break;
-    case 'easy': default: cellsToRemove = 35; break;
+    case 'easy': cellsToRemove = 35; break;
+    case 'beginner': default: cellsToRemove = 25; break;
   }
   
   let attempts = 5; // how many times we can fail to remove without unique solution before giving up 

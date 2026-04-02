@@ -1,17 +1,17 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { TopBar } from '../components/TopBar';
+import { Sidebar } from '../components/Sidebar';
 import { formatTime } from '../utils/gameUtils';
 import { Award, Trophy, Zap, Star, LogOut, Clock } from 'lucide-react';
 
 const badgeIcons = {
-  'Fast Solver': <Zap className="text-yellow-400" size={24} />,
-  'Lightning': <Zap className="text-yellow-500 fill-yellow-500" size={24} />,
-  'No Hint': <Star className="text-purple-400" size={24} />,
-  'No Mistake': <Star className="text-purple-400 fill-purple-400" size={24} />,
-  '1 win': <Trophy className="text-amber-600" size={24} />,
-  '10 wins': <Trophy className="text-slate-400" size={24} />,
-  '50 wins': <Trophy className="text-yellow-400" size={24} />
+  'Fast Solver': <Zap className="text-yellow-500" size={32} />,
+  'Lightning': <Zap className="text-yellow-600 fill-yellow-500" size={32} />,
+  'No Hint': <Star className="text-purple-500" size={32} />,
+  'No Mistake': <Star className="text-purple-600 fill-purple-500" size={32} />,
+  '1 win': <Trophy className="text-amber-700" size={32} />,
+  '10 wins': <Trophy className="text-[#f9a826]" size={32} />,
+  '50 wins': <Trophy className="text-yellow-500 fill-yellow-400" size={32} />
 };
 
 export const Profile = () => {
@@ -28,95 +28,108 @@ export const Profile = () => {
   };
 
   if (!profile) return (
-    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#0f1117] text-slate-900 dark:text-slate-100">
-       <TopBar title={"Profile"} showBack={true} />
-       <div className="flex-1 flex items-center justify-center">Loading...</div>
+    <div className="min-h-screen flex w-full bg-[#f4f4f4] text-slate-900 font-sans">
+       <Sidebar activeTab="profile" />
+       <div className="flex-1 flex items-center justify-center font-bold text-2xl" style={{ fontFamily: "'Caveat Brush', cursive" }}>Loading Profile...</div>
     </div>
   );
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#0f1117] text-slate-900 dark:text-slate-100">
-      <TopBar title={"Profile"} showBack={true} />
+    <div className="min-h-screen flex w-full bg-[#f4f4f4] text-slate-900 font-sans">
+      <Sidebar activeTab="profile" />
       
-      <div className="flex-1 w-full max-w-3xl mx-auto p-4 sm:p-6 lg:p-8 overflow-y-auto hide-scrollbar">
-        
-        {/* Header Stats */}
-        <div className="bg-white dark:bg-[#1a1f2e] rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-center sm:items-start gap-6 mb-8 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl" />
-          
-          <div className="w-24 h-24 bg-gradient-to-tr from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-4xl font-bold text-white shadow-lg shrink-0">
-            {profile.displayName ? profile.displayName[0].toUpperCase() : 'U'}
-          </div>
-          
-          <div className="flex-1 text-center sm:text-left z-10 w-full">
-            <h2 className="text-2xl sm:text-3xl font-bold mb-1">{profile.displayName}</h2>
-            <p className="text-slate-500 dark:text-slate-400 mb-6">{profile.isGuest ? 'Guest Account' : user.email}</p>
-            
-            <div className="flex justify-center sm:justify-start gap-8 border-t border-slate-100 dark:border-slate-800 pt-6">
-              <div className="flex flex-col">
-                <span className="text-xs text-slate-500 uppercase tracking-wider font-semibold">Total Points</span>
-                <span className="text-3xl font-bold text-blue-600 dark:text-blue-400">{profile.points}</span>
-              </div>
-              <div className="flex flex-col">
-                <span className="text-xs text-slate-500 uppercase tracking-wider font-semibold">Games Won</span>
-                <span className="text-3xl font-bold">{profile.gamesPlayed}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Best Times */}
-          <div className="flex flex-col gap-4">
-            <h3 className="text-lg font-bold flex items-center gap-2">
-              <Clock size={20} className="text-blue-500" />
-              Best Times
-            </h3>
-            <div className="bg-white dark:bg-[#1a1f2e] rounded-2xl p-4 shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col gap-3">
-              {['easy', 'medium', 'hard'].map(diff => (
-                <div key={diff} className="flex items-center justify-between p-3 rounded-lg bg-slate-50 dark:bg-slate-800/50">
-                  <span className="capitalize font-medium text-slate-700 dark:text-slate-300">{diff}</span>
-                  <span className="font-mono font-semibold text-emerald-600 dark:text-emerald-400">
-                    {profile.bestTimes?.[diff] ? formatTime(profile.bestTimes[diff]) : '--:--'}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Badges */}
-          <div className="flex flex-col gap-4">
-            <h3 className="text-lg font-bold flex items-center gap-2">
-              <Award size={20} className="text-purple-500" />
-              Badges ({profile.badges?.length || 0})
-            </h3>
-            
-            <div className="bg-white dark:bg-[#1a1f2e] rounded-2xl p-5 shadow-sm border border-slate-200 dark:border-slate-800">
-              {(!profile.badges || profile.badges.length === 0) ? (
-                <div className="text-center text-slate-500 py-8">
-                  Play games to earn badges!
-                </div>
-              ) : (
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                  {profile.badges.map((badge, idx) => (
-                    <div key={idx} className="flex flex-col items-center gap-2 p-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 rounded-xl">
-                      {badgeIcons[badge] || <Award className="text-indigo-400" size={24} />}
-                      <span className="text-xs font-semibold text-center text-slate-700 dark:text-slate-300 leading-tight block w-full truncate">{badge}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
-        <button 
-          onClick={handleLogout}
-          className="mt-12 flex flex-row items-center justify-center gap-2 w-full p-4 rounded-xl text-red-600 dark:text-red-400 border border-red-200 dark:border-red-900/50 hover:bg-red-50 dark:hover:bg-red-900/20 font-semibold transition-colors"
+      <div className="flex-1 flex flex-col p-4 md:p-10 relative overflow-y-auto">
+        <span 
+          className="absolute top-6 right-6 md:left-6 md:right-auto cursor-pointer hover:opacity-70 font-bold text-lg" 
+          style={{ fontFamily: "'Caveat Brush', cursive" }}
+          onClick={() => navigate(-1)}
         >
-          <LogOut size={20} />
-          Sign Out
-        </button>
+          &lt;Back
+        </span>
+
+        <div className="w-full max-w-4xl mx-auto flex flex-col mt-10 md:mt-0">
+          
+          <h1 className="text-5xl font-bold mb-6 text-black text-center md:text-left" style={{ fontFamily: "'Caveat Brush', cursive" }}>Player Profile</h1>
+
+          {/* Header Stats */}
+          <div className="bg-[#fdfdfd] border-[3px] border-black rounded-[24px] p-6 sm:p-8 shadow-[0_4px_16px_rgba(0,0,0,0.04)] flex flex-col sm:flex-row items-center sm:items-start gap-8 mb-8 relative">
+            <div className="w-32 h-32 bg-[#2a2a2a] border-[4px] border-black rounded-full flex items-center justify-center text-6xl text-[#fffdf9] shrink-0" style={{ fontFamily: "'Caveat Brush', cursive" }}>
+              {profile.displayName ? profile.displayName[0].toUpperCase() : 'U'}
+            </div>
+            
+            <div className="flex-1 text-center sm:text-left z-10 w-full mt-2">
+              <h2 className="text-4xl text-black mb-1" style={{ fontFamily: "'Caveat Brush', cursive" }}>{profile.displayName}</h2>
+              <p className="text-slate-500 font-bold tracking-wider mb-6">{profile.isGuest ? 'Guest Account' : user.email}</p>
+              
+              <div className="flex justify-center sm:justify-start gap-12 border-t-[2px] border-slate-200 pt-6">
+                <div className="flex flex-col">
+                  <span className="text-sm font-black text-slate-400 uppercase tracking-widest">Total Points</span>
+                  <span className="text-4xl text-black" style={{ fontFamily: "'Caveat Brush', cursive" }}>{profile.points}</span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-sm font-black text-slate-400 uppercase tracking-widest">Games Won</span>
+                  <span className="text-4xl text-black" style={{ fontFamily: "'Caveat Brush', cursive" }}>{profile.gamesPlayed}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            
+            {/* Best Times */}
+            <div className="flex flex-col gap-4">
+              <h3 className="text-3xl text-black flex items-center gap-3" style={{ fontFamily: "'Caveat Brush', cursive" }}>
+                <Clock size={28} className="text-black" />
+                Best Times
+              </h3>
+              <div className="bg-[#fdfdfd] border-[3px] border-black rounded-[24px] p-6 shadow-sm flex flex-col gap-4">
+                {['beginner', 'easy', 'medium', 'hard', 'extreme'].map(diff => (
+                  <div key={diff} className="flex items-center justify-between p-4 rounded-[16px] bg-[#f4f4f4] border border-slate-200">
+                    <span className="capitalize text-2xl text-black" style={{ fontFamily: "'Caveat Brush', cursive" }}>{diff}</span>
+                    <span className="font-bold text-black bg-white px-4 py-2 rounded-lg border border-slate-300 shadow-sm text-lg" style={{ fontFamily: "'Kalam', cursive" }}>
+                      {profile.bestTimes?.[diff] ? formatTime(profile.bestTimes[diff]) : '--:--'}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Badges */}
+            <div className="flex flex-col gap-4">
+              <h3 className="text-3xl text-black flex items-center gap-3" style={{ fontFamily: "'Caveat Brush', cursive" }}>
+                <Award size={28} className="text-black" />
+                Badges ({profile.badges?.length || 0})
+              </h3>
+              
+              <div className="bg-[#fdfdfd] border-[3px] border-black rounded-[24px] p-6 shadow-sm min-h-[200px]">
+                {(!profile.badges || profile.badges.length === 0) ? (
+                  <div className="flex items-center justify-center h-full text-slate-400 text-2xl" style={{ fontFamily: "'Kalam', cursive" }}>
+                    Play games to earn badges!
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                    {profile.badges.map((badge, idx) => (
+                      <div key={idx} className="flex flex-col items-center justify-center gap-2 p-4 bg-[#f4f4f4] border-[2px] border-slate-200 rounded-[16px] text-center">
+                        {badgeIcons[badge] || <Award className="text-black" size={32} />}
+                        <span className="text-lg text-black leading-tight mt-1" style={{ fontFamily: "'Caveat Brush', cursive" }}>{badge}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+          </div>
+
+          <button 
+            onClick={handleLogout}
+            className="mt-12 mx-auto flex flex-row items-center justify-center gap-3 max-w-[240px] w-full p-4 rounded-[16px] text-white bg-black hover:bg-slate-800 shadow-sm transition-colors"
+          >
+            <LogOut size={24} />
+            <span className="text-2xl pt-1" style={{ fontFamily: "'Caveat Brush', cursive" }}>Sign Out</span>
+          </button>
+
+        </div>
       </div>
     </div>
   );
