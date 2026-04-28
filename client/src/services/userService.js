@@ -3,7 +3,8 @@ export const submitGameResult = async (difficulty, time, pointsEarned, mistakes,
     const token = localStorage.getItem('sudokuToken');
     if (!token) return null;
 
-    const response = await fetch('/api/users/game-result', {
+    const base = import.meta.env.VITE_API_URL || '';
+    const response = await fetch(`${base}/api/users/game-result`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -26,7 +27,8 @@ export const submitGameResult = async (difficulty, time, pointsEarned, mistakes,
 
 export const getLeaderboard = async (difficulty) => {
   try {
-    const response = await fetch(`/api/users/leaderboard/${difficulty}`);
+    const base = import.meta.env.VITE_API_URL || '';
+    const response = await fetch(`${base}/api/users/leaderboard/${difficulty}`);
     
     if (!response.ok) {
       throw new Error('Failed to fetch leaderboard');

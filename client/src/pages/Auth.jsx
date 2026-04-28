@@ -23,7 +23,8 @@ export const Auth = () => {
     const payload = isLogin ? { email, password } : { username, email, password };
 
     try {
-      const res = await fetch(url, {
+      const base = import.meta.env.VITE_API_URL || '';
+      const res = await fetch(`${base}${url}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -49,7 +50,8 @@ export const Auth = () => {
     setError('');
     
     try {
-      const res = await fetch('/api/auth/guest', {
+      const base = import.meta.env.VITE_API_URL || '';
+      const res = await fetch(`${base}/api/auth/guest`, {
         method: 'POST',
       });
       
