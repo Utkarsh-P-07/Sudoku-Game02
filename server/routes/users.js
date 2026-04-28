@@ -28,6 +28,8 @@ router.post('/game-result', protect, async (req, res) => {
     if (!usedHint) checkAndAddBadge('No Hint');
     if (time < 180 && difficulty === 'easy') checkAndAddBadge('Fast Solver');
     if (time < 300 && difficulty === 'hard') checkAndAddBadge('Lightning');
+    if (time < 120 && difficulty === 'beginner') checkAndAddBadge('Fast Solver');
+    if (time < 600 && difficulty === 'extreme') checkAndAddBadge('Lightning');
     
     if (gamesPlayed === 1) checkAndAddBadge('1 win');
     if (gamesPlayed === 10) checkAndAddBadge('10 wins');
@@ -59,7 +61,7 @@ router.get('/leaderboard/:difficulty', async (req, res) => {
   try {
     const { difficulty } = req.params;
     
-    if (!['easy', 'medium', 'hard'].includes(difficulty)) {
+    if (!['beginner', 'easy', 'medium', 'hard', 'extreme'].includes(difficulty)) {
       return res.status(400).json({ message: 'Invalid difficulty' });
     }
 

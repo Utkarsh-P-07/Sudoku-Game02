@@ -23,7 +23,6 @@ export const Game = () => {
   const handleWin = async (result) => {
     if (user && profile) {
       const saveRes = await submitGameResult(
-        user.uid,
         difficulty,
         result.time,
         result.points,

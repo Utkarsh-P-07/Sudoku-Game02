@@ -22,6 +22,7 @@ export const useSudoku = (difficulty = 'easy', onWin = null) => {
   const [timer, setTimer] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [gameStatus, setGameStatus] = useState('loading'); // loading, playing, won, lost
+  const [usedHint, setUsedHint] = useState(false);
 
   const startGame = useCallback((diff = difficulty) => {
     setGameStatus('loading');
@@ -38,6 +39,7 @@ export const useSudoku = (difficulty = 'easy', onWin = null) => {
       setPoints(0);
       setSelectedCell(null);
       setIsPlaying(true);
+      setUsedHint(false);
       setGameStatus('playing');
     }, 50);
   }, [difficulty]);
@@ -160,10 +162,10 @@ export const useSudoku = (difficulty = 'easy', onWin = null) => {
       if (checkWinCondition(newBoard)) {
         setGameStatus('won');
         setIsPlaying(false);
-        if (onWin) onWin({ points: points + pts, time: timer, mistakes });
+        if (onWin) onWin({ points: points + pts, time: timer, mistakes, usedHint });
       }
     }
-  }, [board, initialBoard, solution, selectedCell, isPencilMode, gameStatus, mistakes, points, difficulty, timer, onWin, checkWinCondition, maxMistakes]);
+  }, [board, initialBoard, solution, selectedCell, isPencilMode, gameStatus, mistakes, points, difficulty, timer, onWin, checkWinCondition, maxMistakes, usedHint]);
 
   const eraseCell = useCallback(() => {
     if (gameStatus !== 'playing' || !selectedCell) return;
@@ -203,6 +205,7 @@ export const useSudoku = (difficulty = 'easy', onWin = null) => {
     if (board[r][c] !== solution[r][c] && initialBoard[r][c] === 0) {
       // Significant point penalty
       setPoints(p => Math.max(0, p - 15));
+      setUsedHint(true);
       
       // We don't save history for hints so it can't be undone easily
       const newBoard = copyBoard(board);
@@ -226,6 +229,7 @@ export const useSudoku = (difficulty = 'easy', onWin = null) => {
     setTimer(0);
     setPoints(0);
     setSelectedCell(null);
+    setUsedHint(false);
     setGameStatus('playing');
     setIsPlaying(true);
   };

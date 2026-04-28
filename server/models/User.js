@@ -31,9 +31,11 @@ const userSchema = new mongoose.Schema({
     default: 0
   },
   bestTimes: {
+    beginner: { type: Number, default: null },
     easy: { type: Number, default: null },
     medium: { type: Number, default: null },
-    hard: { type: Number, default: null }
+    hard: { type: Number, default: null },
+    extreme: { type: Number, default: null }
   },
   badges: {
     type: [String],

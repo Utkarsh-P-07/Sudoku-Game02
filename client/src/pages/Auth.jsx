@@ -36,7 +36,7 @@ export const Auth = () => {
       }
 
       loginUser(data.token, data);
-      navigate(-1); // Changed to -1 as requested by user!
+      navigate('/play');
     } catch (err) {
       setError(err.message);
     } finally {
@@ -58,7 +58,7 @@ export const Auth = () => {
       if (!res.ok) throw new Error(data.message || 'Guest login failed');
 
       loginUser(data.token, data);
-      navigate(-1); // Changed to -1 as requested!
+      navigate('/play');
     } catch (err) {
       setError(err.message);
       setLoading(false);
